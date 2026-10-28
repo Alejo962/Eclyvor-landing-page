@@ -1,84 +1,76 @@
-/* ==========================================================================
-   Base: variables de diseño, reset y tipografía
-   ========================================================================== */
+/* Variables de diseño, reset y tipografía */
 
 :root {
-  /* Colores */
-  --color-bg: #0a0a0f;
-  --color-bg-alt: #0e0d15;
-  --color-surface: #13121a;
-  --color-surface-2: #1a1824;
-  --color-border: #262335;
-  --color-border-strong: #3a3550;
+  --fondo: #0a0a0f;
+  --fondo-alt: #0e0d15;
+  --superficie: #13121a;
+  --superficie-2: #1a1824;
+  --borde: #262335;
+  --borde-fuerte: #3a3550;
 
-  --color-text: #ececf1;
-  --color-text-muted: #a3a1b3;
-  --color-text-faint: #77748a;
+  --texto: #ececf1;
+  --texto-suave: #a9a7b9;
+  --texto-tenue: #8f8ca3;
 
-  --color-accent: #8b5cf6;
-  --color-accent-strong: #7c3aed;
-  --color-accent-soft: #a78bfa;
-  --color-accent-glow: rgb(139 92 246 / 0.35);
+  --acento: #8b5cf6;
+  --acento-fuerte: #7c3aed;
+  --acento-claro: #a78bfa;
+  --acento-brillo: rgb(139 92 246 / 0.35);
+  --aviso: #fbbf24;
+  --error: #f87171;
 
-  /* Tipografía */
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+  --fuente: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --fuente-mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
 
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
-  --text-xl: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
-  --text-2xl: clamp(1.75rem, 1.4rem + 1.6vw, 2.5rem);
-  --text-3xl: clamp(2.25rem, 1.6rem + 3.2vw, 4rem);
+  --t-xs: 0.8125rem;
+  --t-sm: 0.875rem;
+  --t-lg: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
+  --t-xl: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  --t-2xl: clamp(1.75rem, 1.4rem + 1.6vw, 2.5rem);
+  --t-3xl: clamp(2.25rem, 1.6rem + 3.2vw, 4rem);
 
-  /* Espaciado y forma */
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-5: 1.5rem;
-  --space-6: 2rem;
-  --space-7: 3rem;
-  --space-8: clamp(4rem, 3rem + 4vw, 7rem);
+  --esp-1: 0.25rem;
+  --esp-2: 0.5rem;
+  --esp-3: 0.75rem;
+  --esp-4: 1rem;
+  --esp-5: 1.5rem;
+  --esp-6: 2rem;
+  --esp-7: 3rem;
+  --esp-8: clamp(4rem, 3rem + 4vw, 7rem);
 
-  --radius-sm: 8px;
-  --radius: 14px;
-  --radius-lg: 20px;
+  --radio-sm: 8px;
+  --radio: 14px;
+  --radio-lg: 20px;
 
-  --container: 1140px;
-  --gutter: 1rem;
-  --header-h: 64px;
+  --ancho-max: 1140px;
+  --margen: 1rem;
+  --alto-cabecera: 64px;
 
-  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
-  --duration: 200ms;
+  --curva: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --duracion: 200ms;
 }
 
 @media (min-width: 640px) {
-  :root { --gutter: 1.5rem; }
+  :root { --margen: 1.5rem; }
 }
 
 @media (min-width: 1024px) {
-  :root { --gutter: 2rem; --header-h: 72px; }
+  :root { --margen: 2rem; --alto-cabecera: 72px; }
 }
-
-/* Reset ------------------------------------------------------------------ */
 
 *,
 *::before,
 *::after {
   box-sizing: border-box;
-}
-
-* {
   margin: 0;
 }
 
 html {
   color-scheme: dark;
-  -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  /* Compensa el header fijo al saltar a una sección */
-  scroll-padding-top: calc(var(--header-h) + var(--space-4));
+  -webkit-text-size-adjust: 100%;
+  /* Deja sitio a la cabecera fija al saltar a una sección */
+  scroll-padding-top: calc(var(--alto-cabecera) + var(--esp-4));
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -87,19 +79,16 @@ html {
 
 body {
   min-height: 100vh;
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-sans);
-  font-size: var(--text-base);
+  background-color: var(--fondo);
+  color: var(--texto);
+  font-family: var(--fuente);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
 }
 
-img,
 svg {
   display: block;
-  max-width: 100%;
 }
 
 ul[class],
@@ -114,7 +103,10 @@ a {
   text-underline-offset: 3px;
 }
 
-button {
+button,
+input,
+select,
+textarea {
   font: inherit;
   color: inherit;
 }
@@ -130,59 +122,68 @@ p {
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent-soft);
+  outline: 2px solid var(--acento-claro);
   outline-offset: 3px;
   border-radius: 4px;
 }
 
 ::selection {
-  background: var(--color-accent);
+  background: var(--acento);
   color: #fff;
 }
 
-/* Utilidades ------------------------------------------------------------- */
-
-.visually-hidden {
-  position: absolute !important;
+.oculto-visual {
+  position: absolute;
   width: 1px;
   height: 1px;
-  padding: 0;
-  margin: -1px;
   overflow: hidden;
-  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
   white-space: nowrap;
-  border: 0;
 }
 
-.skip-link {
+.saltar {
   position: absolute;
-  top: var(--space-2);
-  left: var(--space-2);
+  top: var(--esp-2);
+  left: var(--esp-2);
   z-index: 100;
-  padding: var(--space-2) var(--space-4);
-  background: var(--color-accent);
+  padding: var(--esp-2) var(--esp-4);
+  background: var(--acento-fuerte);
   color: #fff;
-  border-radius: var(--radius-sm);
-  transform: translateY(-200%);
+  border-radius: var(--radio-sm);
+  translate: 0 -200%;
 }
 
-.skip-link:focus {
-  transform: none;
+.saltar:focus {
+  translate: none;
 }
 
-.muted {
-  color: var(--color-text-muted);
+.suave {
+  color: var(--texto-suave);
 }
 
-.text-accent {
-  color: var(--color-accent-soft);
+.texto-acento {
+  color: var(--acento-claro);
+  background: linear-gradient(100deg, var(--acento-claro), #d8ccff 70%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.eyebrow {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
+.antetitulo {
+  display: flex;
+  align-items: center;
+  gap: 0.75em;
+  font-family: var(--fuente-mono);
+  font-size: var(--t-sm);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-accent-soft);
-  margin-bottom: var(--space-3);
+  color: var(--acento-claro);
+  margin-bottom: var(--esp-3);
+}
+
+.antetitulo::before {
+  content: "";
+  width: 20px;
+  height: 1px;
+  background: currentColor;
 }

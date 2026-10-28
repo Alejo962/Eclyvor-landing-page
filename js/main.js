@@ -1,223 +1,195 @@
-/* ==========================================================================
-   Comportamiento de la página
-   ========================================================================== */
+// Comportamiento de la página
 
-(function () {
-  "use strict";
+const datos = window.ECLYVOR ?? {};
+const $ = (selector) => document.querySelector(selector);
+const $$ = (selector) => [...document.querySelectorAll(selector)];
 
-  var config = window.ECLYVOR_CONFIG || {};
-  var DESKTOP_QUERY = window.matchMedia("(min-width: 768px)");
+// Los atributos ARIA necesitan "true" explícito: un valor vacío cuenta como false
+function ariaActivo(elemento, atributo, activo) {
+  if (activo) elemento.setAttribute(atributo, "true");
+  else elemento.removeAttribute(atributo);
+}
 
-  /* Menú móvil ------------------------------------------------------------ */
+function crear(etiqueta, clase, texto) {
+  const elemento = document.createElement(etiqueta);
+  if (clase) elemento.className = clase;
+  if (texto) elemento.textContent = texto;
+  return elemento;
+}
 
-  function initNav() {
-    var header = document.querySelector("[data-header]");
-    var toggle = document.querySelector("[data-nav-toggle]");
-    var nav = document.querySelector("[data-nav]");
-    if (!header || !toggle || !nav) return;
+// Menú móvil
 
-    var label = toggle.querySelector(".visually-hidden");
+const cabecera = $("[data-cabecera]");
+const botonMenu = $("[data-boton-menu]");
 
-    function setOpen(open) {
-      header.classList.toggle("is-open", open);
-      toggle.setAttribute("aria-expanded", String(open));
-      if (label) label.textContent = open ? "Cerrar menú" : "Abrir menú";
-    }
+function abrirMenu(abrir) {
+  cabecera.classList.toggle("abierta", abrir);
+  botonMenu.setAttribute("aria-expanded", abrir);
+  botonMenu.setAttribute("aria-label", abrir ? "Cerrar menú" : "Abrir menú");
+}
 
-    toggle.addEventListener("click", function () {
-      setOpen(toggle.getAttribute("aria-expanded") !== "true");
-    });
+botonMenu.addEventListener("click", () => {
+  abrirMenu(!cabecera.classList.contains("abierta"));
+});
 
-    // Cierra al elegir un enlace
-    nav.addEventListener("click", function (event) {
-      if (event.target.closest("a")) setOpen(false);
-    });
+$("[data-menu]").addEventListener("click", (evento) => {
+  if (evento.target.closest("a")) abrirMenu(false);
+});
 
-    // Cierra con Escape y devuelve el foco al botón
-    document.addEventListener("keydown", function (event) {
-      if (event.key === "Escape" && header.classList.contains("is-open")) {
-        setOpen(false);
-        toggle.focus();
-      }
-    });
+document.addEventListener("click", (evento) => {
+  if (!cabecera.contains(evento.target)) abrirMenu(false);
+});
 
-    // Al pasar a escritorio el panel deja de existir
-    DESKTOP_QUERY.addEventListener("change", function (event) {
-      if (event.matches) setOpen(false);
-    });
+document.addEventListener("keydown", (evento) => {
+  if (evento.key === "Escape" && cabecera.classList.contains("abierta")) {
+    abrirMenu(false);
+    botonMenu.focus();
+  }
+});
+
+matchMedia("(min-width: 768px)").addEventListener("change", () => abrirMenu(false));
+
+// La cabecera toma fondo en cuanto se deja atrás la parte superior
+
+new IntersectionObserver(([entrada]) => {
+  cabecera.classList.toggle("con-fondo", !entrada.isIntersecting);
+}).observe($("[data-marcador]"));
+
+// Marca en el menú la sección que cruza el centro de la pantalla
+
+const enlacesMenu = $$(".menu-lista a");
+const enlacePorSeccion = new Map(
+  enlacesMenu.map((enlace) => [enlace.hash.slice(1), enlace])
+);
+
+function marcarActual(actual) {
+  for (const enlace of enlacesMenu) {
+    enlace.classList.toggle("actual", enlace === actual);
+    ariaActivo(enlace, "aria-current", enlace === actual);
+  }
+}
+
+const vigiaSecciones = new IntersectionObserver((entradas) => {
+  for (const entrada of entradas) {
+    if (entrada.isIntersecting) marcarActual(enlacePorSeccion.get(entrada.target.id));
+  }
+}, { rootMargin: "-50% 0px -50% 0px" });
+
+// La portada no tiene enlace: al volver arriba no queda ninguno marcado
+for (const seccion of $$("main > section")) vigiaSecciones.observe(seccion);
+
+// Proyectos
+
+function tarjetaProyecto(proyecto) {
+  const tarjeta = crear("article", "tarjeta tarjeta-proyecto aparecer");
+
+  const meta = crear("div", "tarjeta-meta");
+  meta.append(crear("span", "etiqueta", proyecto.estado));
+  if (proyecto.provisional) meta.append(crear("span", "etiqueta etiqueta-provisional", "Provisional"));
+
+  const tecnologias = crear("ul", "tecnologias");
+  tecnologias.setAttribute("aria-label", "Tecnologías");
+  for (const nombre of proyecto.tecnologias ?? []) tecnologias.append(crear("li", "", nombre));
+
+  let enlace;
+  if (proyecto.enlace) {
+    enlace = crear("a", "tarjeta-enlace", "Ver proyecto →");
+    enlace.href = proyecto.enlace;
+    enlace.target = "_blank";
+    enlace.setAttribute("aria-label", `Ver proyecto ${proyecto.titulo} (se abre en otra pestaña)`);
+  } else {
+    enlace = crear("p", "tarjeta-enlace pendiente", "Enlace disponible pronto");
   }
 
-  /* Header con fondo al hacer scroll --------------------------------------- */
+  tarjeta.append(
+    meta,
+    crear("h3", "tarjeta-titulo", proyecto.titulo),
+    crear("p", "", proyecto.descripcion),
+    tecnologias,
+    enlace
+  );
+  return tarjeta;
+}
 
-  function initHeaderScroll() {
-    var header = document.querySelector("[data-header]");
-    var sentinel = document.querySelector("[data-header-sentinel]");
-    if (!header || !sentinel || !("IntersectionObserver" in window)) return;
+const proyectos = datos.proyectos ?? [];
+$("[data-proyectos]").replaceChildren(
+  ...(proyectos.length
+    ? proyectos.map(tarjetaProyecto)
+    : [crear("p", "suave", "Pronto publicaremos aquí nuestros primeros proyectos.")])
+);
 
-    new IntersectionObserver(function (entries) {
-      header.classList.toggle("is-scrolled", !entries[0].isIntersecting);
-    }).observe(sentinel);
+// WhatsApp
+
+const contacto = datos.contacto ?? {};
+const numero = String(contacto.whatsapp ?? "").replace(/\D/g, "");
+
+const enlaceWhatsApp = (mensaje) =>
+  `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
+
+const enlacesWhatsApp = $$("[data-whatsapp]");
+
+if (numero) {
+  for (const enlace of enlacesWhatsApp) {
+    const servicio = enlace.dataset.whatsapp;
+    enlace.href = enlaceWhatsApp(
+      servicio ? `Hola, ECLYVOR. Me interesa el servicio de ${servicio}.` : contacto.mensaje
+    );
+    enlace.target = "_blank";
   }
-
-  /* Enlace activo en el menú (scrollspy) ----------------------------------- */
-
-  function initScrollSpy() {
-    var links = Array.prototype.slice.call(document.querySelectorAll(".nav-list a"));
-    if (!links.length || !("IntersectionObserver" in window)) return;
-
-    // Marca visual (.is-current) y semántica (aria-current) a la vez
-    function markCurrent(current) {
-      links.forEach(function (link) {
-        var active = link === current;
-        link.classList.toggle("is-current", active);
-        if (active) {
-          link.setAttribute("aria-current", "true");
-        } else {
-          link.removeAttribute("aria-current");
-        }
-      });
-    }
-
-    var byId = {};
-    links.forEach(function (link) {
-      var section = document.querySelector(link.getAttribute("href"));
-      if (section) byId[section.id] = link;
-    });
-
-    // La sección "activa" es la que cruza la línea central de la pantalla.
-    // El hero no tiene enlace, así que al volver arriba no queda ninguno marcado.
-    var sections = [document.getElementById("inicio")].concat(
-      Object.keys(byId).map(function (id) { return document.getElementById(id); })
-    ).filter(Boolean);
-
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) markCurrent(byId[entry.target.id] || null);
-      });
-    }, { rootMargin: "-50% 0px -50% 0px", threshold: 0 });
-
-    sections.forEach(function (section) { observer.observe(section); });
+} else {
+  // Sin número los enlaces siguen llevando a #contacto, donde se explica el motivo
+  const aviso = $("[data-aviso-whatsapp]");
+  aviso.hidden = false;
+  for (const enlace of enlacesWhatsApp) {
+    enlace.setAttribute("aria-disabled", "true");
+    enlace.setAttribute("aria-describedby", aviso.id);
   }
+}
 
-  /* Proyectos desde config.js ---------------------------------------------- */
+// Formulario: compone el mensaje y lo abre en WhatsApp. No se guarda ni se envía nada más.
 
-  function createEl(tag, className, text) {
-    var el = document.createElement(tag);
-    if (className) el.className = className;
-    if (text) el.textContent = text;
-    return el;
-  }
+const formulario = $("[data-formulario]");
 
-  function renderProjects() {
-    var grid = document.querySelector("[data-projects]");
-    var projects = config.projects || [];
-    if (!grid) return;
+function marcarInvalido(campo) {
+  ariaActivo(campo, "aria-invalid", !campo.validity.valid);
+}
 
-    grid.textContent = "";
+formulario.addEventListener("focusout", (evento) => {
+  if (evento.target.required) marcarInvalido(evento.target);
+});
 
-    if (!projects.length) {
-      grid.appendChild(createEl("p", "muted", "Pronto publicaremos aquí nuestros primeros proyectos."));
-      return;
-    }
+formulario.addEventListener("invalid", (evento) => marcarInvalido(evento.target), true);
 
-    projects.forEach(function (project) {
-      var card = createEl("article", "card project-card reveal");
+formulario.addEventListener("submit", (evento) => {
+  evento.preventDefault();
+  if (!numero) return;
 
-      var meta = createEl("div", "card-meta");
-      if (project.status) meta.appendChild(createEl("span", "badge", project.status));
-      if (project.placeholder) meta.appendChild(createEl("span", "badge badge-placeholder", "Provisional"));
-      card.appendChild(meta);
+  const { nombre, negocio, servicio, detalle } = Object.fromEntries(new FormData(formulario));
+  const mensaje = [
+    `Hola, ECLYVOR. Soy ${nombre.trim()}${negocio.trim() ? ` (${negocio.trim()})` : ""}.`,
+    `Me interesa: ${servicio}.`,
+    detalle.trim()
+  ].join("\n");
 
-      card.appendChild(createEl("h3", "card-title", project.title));
-      card.appendChild(createEl("p", "", project.description));
+  window.open(enlaceWhatsApp(mensaje), "_blank");
+});
 
-      if (project.tags && project.tags.length) {
-        var tags = createEl("ul", "tags");
-        tags.setAttribute("aria-label", "Tecnologías");
-        project.tags.forEach(function (tag) {
-          tags.appendChild(createEl("li", "tag", tag));
-        });
-        card.appendChild(tags);
-      }
+// Correo y redes
 
-      var link;
-      if (project.url) {
-        link = createEl("a", "card-link", "Ver proyecto →");
-        link.href = project.url;
-        link.target = "_blank";
-        link.rel = "noopener";
-      } else {
-        link = createEl("span", "card-link", "Enlace disponible pronto");
-        link.setAttribute("aria-disabled", "true");
-      }
-      card.appendChild(link);
+if (contacto.correo) {
+  const correo = $("[data-correo]");
+  correo.href = `mailto:${contacto.correo}`;
+  correo.textContent = contacto.correo;
+  correo.closest("[hidden]").hidden = false;
+}
 
-      grid.appendChild(card);
-    });
-  }
+for (const red of datos.redes ?? []) {
+  const enlace = crear("a", "", red.nombre);
+  enlace.href = red.enlace;
+  enlace.target = "_blank";
+  const item = crear("li");
+  item.append(enlace);
+  $("[data-redes]").append(item);
+}
 
-  /* Contacto: WhatsApp y correo -------------------------------------------- */
-
-  function initContact() {
-    var contact = config.contact || {};
-    var waLink = document.querySelector("[data-whatsapp-link]");
-    var waNote = document.querySelector("[data-whatsapp-note]");
-    var number = String(contact.whatsappNumber || "").replace(/\D/g, "");
-
-    if (waLink) {
-      if (number) {
-        var text = contact.whatsappMessage ? "?text=" + encodeURIComponent(contact.whatsappMessage) : "";
-        waLink.href = "https://wa.me/" + number + text;
-        waLink.target = "_blank";
-        waLink.rel = "noopener";
-      } else {
-        // Sin número configurado: el botón queda desactivado y se avisa
-        waLink.removeAttribute("href");
-        waLink.setAttribute("aria-disabled", "true");
-        waLink.setAttribute("role", "link");
-        if (waNote) {
-          waNote.textContent = "Provisional: el número de WhatsApp aún no está configurado (js/config.js).";
-          waNote.hidden = false;
-        }
-      }
-    }
-
-    var emailWrap = document.querySelector("[data-email-wrap]");
-    var emailLink = document.querySelector("[data-email-link]");
-    if (contact.email && emailWrap && emailLink) {
-      emailLink.href = "mailto:" + contact.email;
-      emailLink.textContent = contact.email;
-      emailWrap.hidden = false;
-    }
-  }
-
-  /* Footer ----------------------------------------------------------------- */
-
-  function renderSocial() {
-    var list = document.querySelector("[data-social]");
-    if (!list) return;
-    (config.social || []).forEach(function (item) {
-      if (!item || !item.url) return;
-      var li = document.createElement("li");
-      var a = createEl("a", "", item.label || item.url);
-      a.href = item.url;
-      a.target = "_blank";
-      a.rel = "noopener";
-      li.appendChild(a);
-      list.appendChild(li);
-    });
-  }
-
-  function setYear() {
-    var year = document.querySelector("[data-year]");
-    if (year) year.textContent = String(new Date().getFullYear());
-  }
-
-  initNav();
-  initHeaderScroll();
-  renderProjects();
-  initScrollSpy();
-  initContact();
-  renderSocial();
-  setYear();
-})();
+$("[data-anio]").textContent = new Date().getFullYear();
