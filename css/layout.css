@@ -1,0 +1,311 @@
+/* ==========================================================================
+   Layout: contenedor, header, secciones y footer
+   ========================================================================== */
+
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Header ----------------------------------------------------------------- */
+
+.site-header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  height: var(--header-h);
+  border-bottom: 1px solid transparent;
+  transition: background-color var(--duration) var(--ease), border-color var(--duration) var(--ease);
+}
+
+.site-header.is-scrolled,
+.site-header.is-open {
+  background-color: rgb(10 10 15 / 0.85);
+  border-bottom-color: var(--color-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+}
+
+/* Navegación: móvil primero (panel desplegable) */
+.primary-nav {
+  display: none;
+  position: absolute;
+  top: var(--header-h);
+  left: 0;
+  right: 0;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--gutter) var(--space-5);
+  background-color: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.site-header.is-open .primary-nav {
+  display: flex;
+}
+
+.nav-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-list a {
+  display: block;
+  padding: var(--space-3) 0;
+  font-size: var(--text-lg);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  border-bottom: 1px solid var(--color-border);
+  transition: color var(--duration) var(--ease);
+}
+
+/* .is-current lo añade js/main.js según la sección visible */
+.nav-list a:hover,
+.nav-list a.is-current {
+  color: var(--color-text);
+}
+
+@media (min-width: 768px) {
+  .primary-nav,
+  .site-header.is-open .primary-nav {
+    display: flex;
+    position: static;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-5);
+    padding: 0;
+    background: none;
+    border: 0;
+  }
+
+  .nav-list {
+    flex-direction: row;
+    gap: var(--space-5);
+  }
+
+  .nav-list a {
+    position: relative;
+    padding: var(--space-2) 0;
+    font-size: var(--text-sm);
+    border-bottom: 0;
+  }
+
+  .nav-list a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: var(--color-accent);
+    border-radius: 2px;
+    transform: scaleX(0);
+    transition: transform var(--duration) var(--ease);
+  }
+
+  .nav-list a.is-current::after {
+    transform: scaleX(1);
+  }
+}
+
+/* Secciones -------------------------------------------------------------- */
+
+.section {
+  padding-block: var(--space-8);
+}
+
+.section-alt {
+  background-color: var(--color-bg-alt);
+  border-block: 1px solid var(--color-border);
+}
+
+.section-head {
+  max-width: 640px;
+  margin-bottom: var(--space-7);
+}
+
+.section-title {
+  font-size: var(--text-2xl);
+  margin-bottom: var(--space-4);
+}
+
+.section-lead {
+  font-size: var(--text-lg);
+  color: var(--color-text-muted);
+}
+
+/* Hero ------------------------------------------------------------------- */
+
+.hero {
+  position: relative;
+  padding-top: calc(var(--header-h) + var(--space-7));
+  padding-bottom: var(--space-8);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Cuadrícula fina + resplandor violeta (decorativo) */
+.hero::before,
+.hero::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.hero::before {
+  inset: 0;
+  background-image:
+    linear-gradient(var(--color-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-border) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: 0.35;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, #000 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, #000 30%, transparent 75%);
+}
+
+.hero::after {
+  width: min(720px, 120vw);
+  aspect-ratio: 1;
+  top: -30%;
+  right: -20%;
+  background: radial-gradient(circle, var(--color-accent-glow), transparent 65%);
+  filter: blur(40px);
+}
+
+.hero-sentinel {
+  position: absolute;
+  top: 0;
+  height: 1px;
+  width: 1px;
+}
+
+.hero-inner {
+  display: grid;
+  gap: var(--space-7);
+  align-items: center;
+}
+
+.hero-title {
+  font-size: var(--text-3xl);
+  margin-bottom: var(--space-5);
+}
+
+.hero-lead {
+  max-width: 36rem;
+  font-size: var(--text-lg);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-6);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+@media (min-width: 1024px) {
+  .hero {
+    padding-top: calc(var(--header-h) + var(--space-8));
+  }
+
+  .hero-inner {
+    grid-template-columns: 1.25fr 1fr;
+    gap: var(--space-8);
+  }
+}
+
+/* Contacto --------------------------------------------------------------- */
+
+.contact-panel {
+  display: grid;
+  gap: var(--space-6);
+  padding: var(--space-6) var(--space-5);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(ellipse 60% 120% at 100% 0%, rgb(139 92 246 / 0.18), transparent 70%),
+    var(--color-surface);
+}
+
+.contact-panel .section-lead {
+  margin-bottom: 0;
+}
+
+@media (min-width: 768px) {
+  .contact-panel {
+    grid-template-columns: 1.4fr 1fr;
+    align-items: center;
+    padding: var(--space-7);
+  }
+}
+
+/* Footer ----------------------------------------------------------------- */
+
+.site-footer {
+  padding-block: var(--space-7) var(--space-6);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+}
+
+.footer-inner {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.footer-brand .logo {
+  display: inline-block;
+  margin-bottom: var(--space-3);
+}
+
+.footer-brand p {
+  max-width: 28rem;
+}
+
+.footer-nav ul,
+.footer-social {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+}
+
+.footer-nav a,
+.footer-social a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.footer-nav a:hover,
+.footer-social a:hover {
+  color: var(--color-text);
+}
+
+.footer-social:empty {
+  display: none;
+}
+
+.footer-legal {
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+@media (min-width: 768px) {
+  .footer-inner {
+    grid-template-columns: 1.5fr 1fr;
+  }
+
+  .footer-legal {
+    grid-column: 1 / -1;
+  }
+}
