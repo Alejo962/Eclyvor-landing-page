@@ -14,10 +14,12 @@ window.ECLYVOR = {
   // Se muestran en el pie
   redes: [
     { nombre: "GitHub", 
-      enlace: "https://github.com/Alejo962", 
-      nombre: "Facebook", 
-      enlace: "https://www.facebook.com/profile.php?id=61594677965976", 
-      nombre: "Instagram", 
+      enlace: "https://github.com/Alejo962"
+    }, 
+    { nombre: "Facebook", 
+      enlace: "https://www.facebook.com/profile.php?id=61594677965976" 
+    },
+    { nombre: "Instagram", 
       enlace: "https://www.instagram.com/eclyvor4"
 
     
