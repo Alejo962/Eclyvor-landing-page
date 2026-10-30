@@ -5,7 +5,7 @@ window.ECLYVOR = {
   contacto: {
     // Formato internacional, solo dígitos: prefijo del país + número, sin "+" ni espacios.
     // Ejemplo para Colombia: "573001234567". Si se deja vacío, el botón aparece desactivado.
-    whatsapp: "3001002399",
+    whatsapp: "573001002399",
     mensaje: "Hola, ECLYVOR. Me gustaría hablar sobre un proyecto para mi negocio.",
     // Opcional. Vacío = no se muestra.
     correo: ""
@@ -14,7 +14,11 @@ window.ECLYVOR = {
   // Se muestran en el pie
   redes: [
     { nombre: "GitHub", 
-      enlace: "https://github.com/Alejo962"
+      enlace: "https://github.com/Alejo962", 
+      nombre: "Facebook", 
+      enlace: "https://www.facebook.com/profile.php?id=61594677965976", 
+      nombre: "Instagram", 
+      enlace: "https://www.instagram.com/eclyvor4"
 
     
     }

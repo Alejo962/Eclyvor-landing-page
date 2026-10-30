@@ -27,21 +27,6 @@ Hecho con HTML semántico, CSS y JavaScript vanilla, sin frameworks ni dependenc
     └── compartir.png      Imagen que aparece al compartir el enlace (1200×630)
 ```
 
-## Ejecutar en local
-
-No hay que instalar nada. Hay dos opciones:
-
-1. **Abrir el archivo directamente:** doble clic en `index.html`.
-2. **Usar un servidor local** (recomendado, se comporta igual que la web publicada):
-
-   ```bash
-   python3 -m http.server 8000
-   ```
-
-   Después abre <http://localhost:8000> en el navegador.
-
-Con el servidor de Python, las rutas inexistentes no muestran `404.html`: eso solo ocurre en GitHub Pages. Para verla, abre <http://localhost:8000/404.html>.
-
 ## Editar el contenido
 
 Lo que cambia con frecuencia está en [`js/config.js`](js/config.js):
